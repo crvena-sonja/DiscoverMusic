@@ -1,0 +1,25 @@
+This app will cater to women
+
+it will present users's with a few options on amenities to be searched for based on their location
+
+users will enter their address or use the current location(as a default) and be presented with an 
+
+ordered list of the top 5 choices within a 20 mile radius of their location
+
+if there are none users will receive a "No results found" message and be asked to enter a different location
+
+web addresses will be hyperlinks that will direct the user to the spa's website
+
+users will also be shown a map of where the locations are
+
+choices to be included will only return those that have a 3.5 star rating or above.
+
+
+what does this app do?
+find a good spa quick
+
+user story
+search for in a specific location
+select results get details
+*favs list
+*search a greater distance if no results found
