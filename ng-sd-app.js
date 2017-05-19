@@ -2,86 +2,102 @@
 
 const appState = {
 
-	results: [],
+	search: "",
 	artistID: [],
 	artistAlbumID: [],
 	artistTracks: [],
-	albumsIDs: []
+	albumsIDs: [],
+	availAlbums: [],
+	initialTracks: [],
+	trackIDs: [],
+	lowPopTracks: []
 }
 
-// console.log('that', appState.albumsIDs);
-function querySpotifyArtist (artist){
 
-	const query = {
+function querySpotifyArtist (search){
+
+	const query1 = {
 		type: 'artist', 														
-		q: artist
-
+		q: search
 	}
-
-	$.getJSON("https://api.spotify.com/v1/search", query, function(response)  {
+	$.getJSON("https://api.spotify.com/v1/search", query1, function(response)  {
 			 appState.artistID.push(response.artists.items[0].id);
 				querySpotifyAlbums();
-
 	});
 
 } 
 
 function querySpotifyAlbums(){
-									///STORE RESULT IN A VARIABLE TO BE USED LATER
-	const query = {
-		id: appState.artistID[0]
-	}
-
-	$.getJSON(`https://api.spotify.com/v1/artists/${appState.artistID[0]}/albums`, query, (response) => {				//query2 GETS US THE TRACKS USING ARTIST ID
-						response.items.forEach( item => appState.artistAlbumID.push(item.id))
-				// console.log(appState.artistAlbumID);	
-				 querySpotifyTracks();	
-// 
+	$.getJSON(`https://api.spotify.com/v1/artists/${appState.artistID[0]}/albums`, {}, (response) => {				//query2 GETS US THE TRACKS USING ARTIST ID
+						response.items.forEach( item => appState.artistAlbumID.push(item.id));
+						querySpotifyTrackIDs();
 	});
 }
 
- 	function querySpotifyTracks(){
- 	 albumIDs = appState.artistAlbumID.join(",");
- 		console.log(albumIDs);
- 		// const query = {
+function querySpotifyTrackIDs(){
+	const query3 = {
+		ids: appState.artistAlbumID.join(','),
+	}
+	console.log(query3.ids);
 
- 		// 	id: albumIDs
+	$.getJSON(`https://api.spotify.com/v1/albums`, query3, (response) => { 
+		console.log(response);
 
- 		// }
+		appState.availAlbums.push(response.albums.filter( function(element) {
+			return (element.available_markets.includes("US"));
+			}));
 
+		//console.log(appState.availAlbums);
+		appState.availAlbums[0].forEach(element2 => { element2.tracks.items.forEach(
+			element => {appState.initialTracks.push(element);} )} );
+		//console.log(appState.initialTracks);
+		appState.initialTracks.forEach(element => appState.trackIDs.push(element.id));
+		console.log(appState.trackIDs);
+		querySpotifyTracks();
+	});
+}
 
-
- 	// 	$.getJSON(`https://api.spotify.com/v1/albums`, query, (response) => {				//query2 GETS US THE TRACKS USING ARTIST ID
-		// 				// response.items.forEach( item => appState.artistAlbumID.push(item.id))
-		// 		console.log(response);	
-		// })
-
-
-
-		$.ajax({
-    type: "POST",
-    url: "https://api.spotify.com/v1/albums",
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    data: "{id: '" + albumIDs + "'}",
-    success: function(json) {
-        $("#success").html("json.length=" + json.length);
-        itemAddCallback(json);
-    },
-    // error: function (xhr, textStatus, errorThrown) {
-    //     $("#error").html(xhr.responseText);
-    // }
-});
+function querySpotifyTracks(){
+	const query4 = {
+		ids: appState.trackIDs.slice(0, 50).join(','),
 	}
 
-querySpotifyArtist('adele');
+	$.getJSON('https://api.spotify.com/v1/tracks', query4, (response) => {
+		(response.tracks.filter(element => element.popularity <= 50)).forEach(element => appState.lowPopTracks.push(element));
+		console.log(appState.lowPopTracks);
+		renderTracks($('.tracks'));
 
-// console.log('bam', appState.artistID);
+	});
+}
 
-//1 get artist
-//2 get id
-//3 get albums
+function renderTracks(element){
+	let html = `<ul>`;
 
-//4 get songs
+	let j;
+	appState.lowPopTracks.length >= 10 ? j=10 : j=appState.lowPopTracks.length;
 
-//https://api.spotify.com/v1/artists/{id}/albums
+	for(let i = 0; i < j; i++){
+		html += `<li>${appState.lowPopTracks[i].name}</li>`;
+	}
+
+	html += `</ul>`;
+	element.html(html);
+	element.removeClass("hidden");
+}
+
+function addListeners(){
+
+	$('form').on('submit', function(event){
+		event.preventDefault();
+		appState.search = $('#search-spotify').val();
+		querySpotifyArtist(appState.search);
+	});
+}
+
+$(function () {
+
+addListeners();
+
+});
+
+
