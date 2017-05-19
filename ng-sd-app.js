@@ -23,12 +23,19 @@ function querySpotifyArtist (search){
 	$.getJSON("https://api.spotify.com/v1/search", query1, function(response)  {
 			 appState.artistID.push(response.artists.items[0].id);
 				querySpotifyAlbums();
+				emptyState(appState);
+
 	});
 
 } 
 
 function querySpotifyAlbums(){
-	$.getJSON(`https://api.spotify.com/v1/artists/${appState.artistID[0]}/albums`, {}, (response) => {				//query2 GETS US THE TRACKS USING ARTIST ID
+	// const query ={
+	// 	limit: 50
+	// }
+
+	$.getJSON(`https://api.spotify.com/v1/artists/${appState.artistID[0]}/albums`, (response) => {				//query2 GETS US THE TRACKS USING ARTIST ID
+						console.log('this', response)
 						response.items.forEach( item => appState.artistAlbumID.push(item.id));
 						querySpotifyTrackIDs();
 	});
@@ -36,12 +43,13 @@ function querySpotifyAlbums(){
 
 function querySpotifyTrackIDs(){
 	const query3 = {
-		ids: appState.artistAlbumID.join(','),
+		// limit: 50,
+		ids: appState.artistAlbumID.splice(0, 20).join(','),
 	}
 	console.log(query3.ids);
 
 	$.getJSON(`https://api.spotify.com/v1/albums`, query3, (response) => { 
-		console.log(response);
+		console.log('this', response);
 
 		appState.availAlbums.push(response.albums.filter( function(element) {
 			return (element.available_markets.includes("US"));
@@ -66,23 +74,33 @@ function querySpotifyTracks(){
 		(response.tracks.filter(element => element.popularity <= 50)).forEach(element => appState.lowPopTracks.push(element));
 		console.log(appState.lowPopTracks);
 		renderTracks($('.tracks'));
+		});
+}
 
-	});
+function emptyState(state){
+	state.lowPopTracks = [];
 }
 
 function renderTracks(element){
-	let html = `<ul>`;
+	let html = ``;
 
 	let j;
 	appState.lowPopTracks.length >= 10 ? j=10 : j=appState.lowPopTracks.length;
 
 	for(let i = 0; i < j; i++){
-		html += `<li>${appState.lowPopTracks[i].name}</li>`;
+		html += `<div class="image-container col-3">
+					
+					<img src="${appState.lowPopTracks[i].album.images[0].url}">
+					<a href="${appState.lowPopTracks[i].preview_url}"><h3>${appState.lowPopTracks[i].name}</h3><a/>
+
+
+				</div>`;
 	}
 
-	html += `</ul>`;
+	//html += `</ul>`;
 	element.html(html);
 	element.removeClass("hidden");
+
 }
 
 function addListeners(){

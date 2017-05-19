@@ -72,3 +72,6 @@ li {
     display:none;
 }
 
+.image-container{
+	display: inline-block;
+}
