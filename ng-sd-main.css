@@ -84,3 +84,7 @@ a {
 .image-container{
 	width: 100%;
 }
+
+iframe{
+	height: 80px;
+}

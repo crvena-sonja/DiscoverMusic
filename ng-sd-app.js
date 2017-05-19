@@ -102,24 +102,29 @@ function renderTracks(element){
 	let j;
 	appState.lowPopTracks.length >= 9 ? j=9 : j=appState.lowPopTracks.length;
 
+
+		 html += `<iframe src="" class="hidden"></iframe>`;
+		// html += `<audio controls autoplay  class="hidden">
+		// 			<source src="" type="audio/mpeg">
+		// 		</audio>`
 		for(let i = 0; i < j; i+=3){ //0, 3, 6, 9
 			html += `<div class="row">
 						<div class="col-4">
 							<div class="track">
 								<img class="image-container" src="${appState.lowPopTracks[i].album.images[0].url}">
-								<a href="${appState.lowPopTracks[i].preview_url}"><h3 id="${i}">${appState.lowPopTracks[i].name}</h3><a/>
+								<a id="${i}" href="${appState.lowPopTracks[i].preview_url}"><h3>${appState.lowPopTracks[i].name}</h3><a/>
 							</div>
 						</div>
 						<div class="col-4">
 							<div class="track">
 								<img class="image-container" src="${appState.lowPopTracks[i+1].album.images[0].url}">
-								<a href="${appState.lowPopTracks[i+1].preview_url}"><h3 id="${i+1}">${appState.lowPopTracks[i+1].name}</h3><a/>
+								<a id="${i+1}" href="${appState.lowPopTracks[i+1].preview_url}"><h3>${appState.lowPopTracks[i+1].name}</h3><a/>
 							</div>
 						</div>
 						<div class="col-4">
 							<div class="track">
 								<img class="image-container" src="${appState.lowPopTracks[i+2].album.images[0].url}">
-								<a href="${appState.lowPopTracks[i+2].preview_url}"><h3 id="${i+2}">${appState.lowPopTracks[i+2].name}</h3><a/>
+								<a id="${i+2}" href="${appState.lowPopTracks[i+2].preview_url}"><h3>${appState.lowPopTracks[i+2].name}</h3><a/>
 							</div>
 						</div>
 					</div>`;
@@ -140,10 +145,20 @@ function addListeners(){
 		querySpotifyArtist(appState.search);
 	});
 
-	// $('tracks').on('click', 'a', function(event){
-	// 	//event.preventDefault();
-	// 	renderIFrame(appState, $(this), $(this).closest('.results').find('iframe'));
-	// });
+	$('.tracks').on('click', 'a', function(event){
+		event.preventDefault();
+		let iframe = $(this).attr("href");
+		// console.log(audio);
+		// $('audio').find('source').attr("src", audio).toggle("hidden");
+
+		$('iframe').attr("src", iframe).toggle("hidden");
+		});
+
+	$('main').on( 'click', 'iframe',function(event){
+		event.preventDefault();	
+		$(this).css({display: 'none'});
+		//$(this).addClass('hidden');
+	});
 }
 
 $(function () {
@@ -151,5 +166,4 @@ $(function () {
 addListeners();
 
 });
-
 
