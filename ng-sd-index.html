@@ -2,25 +2,32 @@
 <html>
 <head>
 	<title>Discover B Sides</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="normalize.min.css">
+	<link rel="stylesheet" type="text/css" href="float-grid.css">
     <link rel="stylesheet" href="ng-sd-main.css">
-    <link rel="stylesheet" type="text/css" href="float-grid.css">
 </head>
 <body>
+	
 	<header>
 		<h1>Discover Music</h1>
 	</header>
-	<main>
-		<div>
-			<form action="ng-sd-index.html" method="post">
-            	<label for="search-spotify"></label>
-            	<input type="text" id="search-spotify" placeholder="Enter an artist to search" required>
-            	<input class="glass" type="image" src="magnifying-glass.png" alt="Search">
-        	</form>
-		</div>
-		<div class="tracks hidden row">
-        	
 
+	<main>
+		<div class="row">
+			<div class="col-12">
+				<form action="ng-sd-index.html" method="post">
+            		<label for="search-spotify"></label>
+            		<input type="text" id="search-spotify" placeholder="Enter an artist to search" required>
+            		<input class="glass" type="image" src="magnifying-glass.png" alt="Search">
+        		</form>
+        	</div>
+		</div>
+		<div class="row">
+			<div class="tracks hidden">
+		
+        	
+			</div>
     	</div>
 
 	</main>

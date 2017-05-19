@@ -21,10 +21,16 @@ function querySpotifyArtist (search){
 		q: search
 	}
 	$.getJSON("https://api.spotify.com/v1/search", query1, function(response)  {
-			 appState.artistID.push(response.artists.items[0].id);
-				querySpotifyAlbums();
-				emptyState(appState);
-
+			 	emptyState(appState);
+			 	console.log(response);
+			 	if (response.artists.items.length === 0){
+			 		renderTracks($('.tracks'));
+			 	}
+			 	else{
+			 		appState.artistID.push(response.artists.items[0].id);
+			 		querySpotifyAlbums();
+			 	}
+				
 	});
 
 } 
@@ -78,23 +84,49 @@ function querySpotifyTracks(){
 }
 
 function emptyState(state){
+	state.artistID = [];
+	state.artistAlbumID = [];
+	state.artistTracks = [];
+	state.albumsIDs = [];
+	state.availAlbums = [];
+	state.initialTracks = [];
+	state.trackIDs = [];
 	state.lowPopTracks = [];
+
 }
 
 function renderTracks(element){
 	let html = ``;
 
+	if(appState.artistID.length === 0){
+		html += `<h2>Oops! We can't find that artist, try another.</h2>`; 
+	}
+	else{
 	let j;
-	appState.lowPopTracks.length >= 10 ? j=10 : j=appState.lowPopTracks.length;
+	appState.lowPopTracks.length >= 9 ? j=9 : j=appState.lowPopTracks.length;
 
-	for(let i = 0; i < j; i++){
-		html += `<div class="image-container col-3">
-					
-					<img src="${appState.lowPopTracks[i].album.images[0].url}">
-					<a href="${appState.lowPopTracks[i].preview_url}"><h3>${appState.lowPopTracks[i].name}</h3><a/>
-
-
-				</div>`;
+		for(let i = 0; i < j; i+=3){ //0, 3, 6, 9
+			html += `<div class="row">
+						<div class="col-4">
+							<div class="track">
+								<img class="image-container" src="${appState.lowPopTracks[i].album.images[0].url}">
+								<a href="${appState.lowPopTracks[i].preview_url}"><h3 id="${i}">${appState.lowPopTracks[i].name}</h3><a/>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="track">
+								<img class="image-container" src="${appState.lowPopTracks[i+1].album.images[0].url}">
+								<a href="${appState.lowPopTracks[i+1].preview_url}"><h3 id="${i+1}">${appState.lowPopTracks[i+1].name}</h3><a/>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="track">
+								<img class="image-container" src="${appState.lowPopTracks[i+2].album.images[0].url}">
+								<a href="${appState.lowPopTracks[i+2].preview_url}"><h3 id="${i+2}">${appState.lowPopTracks[i+2].name}</h3><a/>
+							</div>
+						</div>
+					</div>`;
+		}
 	}
 
 	//html += `</ul>`;
@@ -110,6 +142,11 @@ function addListeners(){
 		appState.search = $('#search-spotify').val();
 		querySpotifyArtist(appState.search);
 	});
+
+	// $('tracks').on('click', 'a', function(event){
+	// 	//event.preventDefault();
+	// 	renderIFrame(appState, $(this), $(this).closest('.results').find('iframe'));
+	// });
 }
 
 $(function () {
