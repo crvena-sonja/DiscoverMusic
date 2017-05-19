@@ -36,9 +36,6 @@ function querySpotifyArtist (search){
 } 
 
 function querySpotifyAlbums(){
-	// const query ={
-	// 	limit: 50
-	// }
 
 	$.getJSON(`https://api.spotify.com/v1/artists/${appState.artistID[0]}/albums`, (response) => {				//query2 GETS US THE TRACKS USING ARTIST ID
 						console.log('this', response)
