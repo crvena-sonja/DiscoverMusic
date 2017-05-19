@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Find a Spa NOW!</title>
+	<title>Discover B Sides</title>
 	<link rel="stylesheet" href="normalize.min.css">
     <link rel="stylesheet" href="ng-sd-main.css">
 </head>
 <body>
 	<header>
-		<h1>Find a Spa</h1>
+		<h1>Discover Music</h1>
 	</header>
 	<main>
-		<div class="intro">
-			<img src="http://www.tesororesorts.com/los-cabos/img/stones-black-massage-spa-candles-water-bamboo-wallpapers-75.jpg"> 
+		<div>
+			<form action="ng-sd-index.html" method="post">
+            	<label for="search-spotify"></label>
+            	<input type="text" id="search-spotify" placeholder="Enter an artist to search" required>
+            	<input class="glass" type="image" src="magnifying-glass.png" alt="Search">
+        	</form>
 		</div>
+		<div class="tracks hidden">
+        	
+
+    	</div>
+
 	</main>
 
  	<script src="https://code.jquery.com/jquery-3.2.1.min.js" 
