@@ -13,7 +13,15 @@ const appState = {
   lowPopTracks: []
 };
 
-
+/**
+ * @function querySpotifyArtist
+ * @desc gets the JSON element from the Spotify API 
+ *       use JSON element to get the first item(playlist/album) of the artist
+ *       send that data to querySpotifyAlbums
+ * @param {search} search string that was inputted in the input box (artist name)
+ * @returns undefined
+ */
+ 
 function querySpotifyArtist (search){
 
   const query1 = {
@@ -35,6 +43,13 @@ function querySpotifyArtist (search){
 
 } 
 
+/**
+ * @function querySpotifyAlbums
+ * @desc  get the JSON element from the Spotify API 
+ *        use JSON element to get the albums from the artist the user searched
+ *        send that data to querySpotifyTrackIDS
+ * @returns undefined
+ */
 function querySpotifyAlbums(){
 
   $.getJSON(`https://api.spotify.com/v1/artists/${appState.artistID[0]}/albums`, (response) => {				//query2 GETS US THE TRACKS USING ARTIST ID
@@ -44,6 +59,14 @@ function querySpotifyAlbums(){
   });
 }
 
+/**
+ * @function querySpotifyTrackIDs
+ * @desc get the JSON element from the Spotify API 
+ *       use JSON element to get albums that are available in US and push the tracks from each of these albums into initalTracks
+ *       send that data to querySpotifyTracks
+ * @returns undefined
+ * 
+ */
 function querySpotifyTrackIDs(){
   const query3 = {
 		// limit: 50,
@@ -54,20 +77,30 @@ function querySpotifyTrackIDs(){
   $.getJSON('https://api.spotify.com/v1/albums', query3, (response) => { 
     console.log('this', response);
 
+    //can be made into a small function (filter all the albums available in U.S.)
     appState.availAlbums.push(response.albums.filter( function(element) {
       return (element.available_markets.includes('US'));
     }));
 
 		//console.log(appState.availAlbums);
+    //can be made into a small function (grabs a array of albums that are available in U.S. and add tracks from each of these albums into initalTracks)
+    //element2 should be given a new name :P 
     appState.availAlbums[0].forEach(element2 => { element2.tracks.items.forEach(
 			element => {appState.initialTracks.push(element);} );} );
 		//console.log(appState.initialTracks);
+    //can be made into small function (gets all the track ids)
     appState.initialTracks.forEach(element => appState.trackIDs.push(element.id));
     console.log(appState.trackIDs);
     querySpotifyTracks();
   });
 }
 
+/**
+ * @function querySpotifyTracks
+ * @desc  gets a JSON element from Spotify API 
+ *        use JSON element to get tracks with popularity less than 50 and then add those objects into lowPopTracks
+ * @returns undefined
+ */
 function querySpotifyTracks(){
   const query4 = {
     ids: appState.trackIDs.slice(0, 50).join(','),
@@ -80,6 +113,12 @@ function querySpotifyTracks(){
   });
 }
 
+/**
+ * @function emptyState
+ * @desc resets the state to the original
+ * @param {state} the appState
+ * @returns undefined
+ */
 function emptyState(state){
   state.artistID = [];
   state.artistAlbumID = [];
@@ -92,6 +131,12 @@ function emptyState(state){
 
 }
 
+/**
+ * @function renderTracks
+ * @desc renders the tracks onto the DOM
+ * @param {element} the jQuery element that will get affected 
+ * @returns undefined
+ */
 function renderTracks(element){
   let html = '';
 
@@ -137,6 +182,13 @@ function renderTracks(element){
 
 }
 
+/**
+ * @function addListeners
+ * @desc code gets runned when the user clicks on submit, 
+ *        when the user clicks on the song name, 
+ *        when the user click on the iframe that shows up
+ * @returns undefined
+ */
 function addListeners(){
 
   $('form').on('submit', function(event){
