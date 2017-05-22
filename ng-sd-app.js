@@ -12,6 +12,66 @@ const appState = {
   trackIDs: [],
   lowPopTracks: []
 };
+//State Modification functions
+/**
+ * @function getArtist
+ * @desc get the first item(playlist/album) of the artist
+ * @param {state} state that will be modified
+ * @param {response} response data from the spotify api
+ * @returns state.artistID (first item of the artist)
+ */
+function getArtist(state,response){
+  state.artistID.push(response.artists.items[0].id);
+  return state.artistID;
+}
+/**
+ * @function getArtistAlbums
+ * @desc get all albums from searched artist
+ * @param {state} state that will be modified
+ * @param {response} response data from the spotify api
+ * @returns state.artistAlbumID (all albums from searched artist)
+ */
+function getArtistAlbums(state,response){
+  response.items.forEach( item => state.artistAlbumID.push(item.id));
+  return state.artistAlbumID;
+}
+/**
+ * @function availAlbumsInUS
+ * @desc filter all the albums available in U.S.
+ * @param {state} state that will be modified
+ * @param {response} response data from the spotify api
+ * @returns state.availAlbums (all albums that are available in US)
+ * changed element to album
+ */
+function availAlbumsInUS(state,response){
+  state.availAlbums.push(response.albums.filter( album => album.available_markets.includes('US')));
+  return state.availAlbums;
+}
+/**
+ * @function availTracksInUS
+ * @desc grabs a array of albums that are available in U.S. and add tracks from each of these albums into initalTracks
+ * @param {state} state that will be modified
+ * @returns state.initialTracks (all tracks that are available in US)
+ * changed element2 to albumsInUS
+ * changed element to tracks
+ */
+function availTracksInUS(state){
+  state.availAlbums[0].forEach(albumsInUS => { albumsInUS.tracks.items.forEach(
+	tracks => {state.initialTracks.push(tracks);} );} );
+  return state.initialTracks;
+}
+/**
+ * @function getTrackIDs
+ * @desc gets all the track ids
+ * @param {state} state that will be modified
+ * @returns state.trackIDs (all track ids that are available in US)
+ * changed element to track
+ */
+function getTrackIDs(state){
+  state.initialTracks.forEach(track => state.trackIDs.push(track.id));
+  return state.trackIDs;
+}
+
 
 /**
  * @function querySpotifyArtist
@@ -35,7 +95,7 @@ function querySpotifyArtist (search){
 			 		renderTracks($('.tracks'));
 			 	}
 			 	else{
-			 		appState.artistID.push(response.artists.items[0].id);
+			 		getArtist(appState,response);
 			 		querySpotifyAlbums();
 			 	}
 				
@@ -54,7 +114,7 @@ function querySpotifyAlbums(){
 
   $.getJSON(`https://api.spotify.com/v1/artists/${appState.artistID[0]}/albums`, (response) => {				//query2 GETS US THE TRACKS USING ARTIST ID
     console.log('this', response);
-    response.items.forEach( item => appState.artistAlbumID.push(item.id));
+    getArtistAlbums(appState,response);
     querySpotifyTrackIDs();
   });
 }
@@ -76,20 +136,13 @@ function querySpotifyTrackIDs(){
 
   $.getJSON('https://api.spotify.com/v1/albums', query3, (response) => { 
     console.log('this', response);
-
-    //can be made into a small function (filter all the albums available in U.S.)
-    appState.availAlbums.push(response.albums.filter( function(element) {
-      return (element.available_markets.includes('US'));
-    }));
+    availAlbumsInUS(appState,response);
 
 		//console.log(appState.availAlbums);
-    //can be made into a small function (grabs a array of albums that are available in U.S. and add tracks from each of these albums into initalTracks)
-    //element2 should be given a new name :P 
-    appState.availAlbums[0].forEach(element2 => { element2.tracks.items.forEach(
-			element => {appState.initialTracks.push(element);} );} );
+    availTracksInUS(appState);
+
 		//console.log(appState.initialTracks);
-    //can be made into small function (gets all the track ids)
-    appState.initialTracks.forEach(element => appState.trackIDs.push(element.id));
+    getTrackIDs(appState);
     console.log(appState.trackIDs);
     querySpotifyTracks();
   });
